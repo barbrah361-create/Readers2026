@@ -47,5 +47,25 @@
     "bookmarks": [],
     "readingHistory": [],
     "updatedAt": "2026-07-03T09:27:15.205Z"
+  },
+  {
+    "_id": "zo156b7wrtrbaivi5hjpsr",
+    "id": "zo156b7wrtrbaivi5hjpsr",
+    "createdAt": "2026-07-03T09:51:52.203Z",
+    "username": "Wendy",
+    "email": "Wendy361@gmail.com",
+    "passwordHash": "$2b$10$MuAP6rd9Th.7TvbqxqNrMuW7RjlaWhTG5fpKoZwjEcMDVjYKrKoGO",
+    "role": "user",
+    "avatar": "/uploads/avatar-1783072352853-714322341.jpeg",
+    "bio": "",
+    "location": "",
+    "website": "",
+    "twitter": "",
+    "instagram": "",
+    "linkedin": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": [],
+    "updatedAt": "2026-07-03T09:52:32.906Z"
   }
 ]
