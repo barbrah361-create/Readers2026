@@ -1,0 +1,127 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/flash') %>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
+  <!-- Header -->
+  <div class="mb-10">
+    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-gray-800 dark:text-brand-pink">Account Settings</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your public archival persona and secure login settings.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Sidebar / Overview -->
+    <div class="lg:col-span-4 bg-white dark:bg-[#1E150F] p-6 sm:p-8 rounded-2xl shadow-sm border border-brand-brown/10 dark:border-brand-brown/20 flex flex-col items-center text-center h-fit">
+      <div class="relative group">
+        <img src="<%= profileUser.avatar || '/uploads/default-avatar.png' %>" alt="<%= profileUser.username %>" class="w-32 h-32 rounded-full object-cover ring-4 ring-brand-pink shadow-md">
+        
+        <!-- Quick Form inside camera button -->
+        <form action="/auth/profile/avatar" method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0" id="avatar-form">
+          <!-- Hidden input but custom button -->
+          <label for="avatar-input" class="w-10 h-10 rounded-full bg-brand-brown hover:bg-brand-accent text-white flex items-center justify-center cursor-pointer shadow-md transition-colors">
+            <i data-lucide="camera" class="w-4.5 h-4.5"></i>
+          </label>
+          <input type="file" id="avatar-input" name="avatar" class="hidden" accept="image/*" onchange="document.getElementById('avatar-submit-btn').click();">
+          <button type="submit" id="avatar-submit-btn" class="hidden"></button>
+        </form>
+      </div>
+
+      <h2 class="font-serif text-2xl font-bold mt-5 text-gray-800 dark:text-white"><%= profileUser.username %></h2>
+      <span class="inline-flex mt-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-pink/25 text-brand-brown dark:text-brand-pink border border-brand-pink/20 uppercase tracking-widest">
+        <%= profileUser.role %> Member
+      </span>
+      <p class="text-xs text-gray-400 mt-2">Registered since <%= new Date(profileUser.createdAt).toLocaleDateString() %></p>
+
+      <% if (profileUser.bio) { %>
+        <p class="text-sm text-gray-600 dark:text-gray-300 italic mt-6 leading-relaxed bg-brand-cream/30 dark:bg-brand-brown/10 p-4 rounded-xl border border-brand-brown/5">
+          "<%= profileUser.bio %>"
+        </p>
+      <% } else { %>
+        <p class="text-xs text-gray-400 italic mt-6">No public bio drafted yet. Pen down your literary tastes below.</p>
+      <% } %>
+
+      <!-- Helpful hint -->
+      <div class="mt-8 pt-6 border-t border-brand-brown/10 w-full text-left text-xs text-gray-400">
+        <p class="flex items-center gap-1.5 justify-center">
+          <i data-lucide="info" class="w-4 h-4 text-brand-brown dark:text-brand-pink"></i>
+          Click camera icon to change photo
+        </p>
+      </div>
+    </div>
+
+    <!-- Forms Area -->
+    <div class="lg:col-span-8 space-y-8">
+      
+      <!-- Card A: Public Profile details -->
+      <div class="bg-white dark:bg-[#1E150F] p-6 sm:p-8 rounded-2xl shadow-sm border border-brand-brown/10 dark:border-brand-brown/20">
+        <h3 class="font-serif text-xl font-bold text-gray-800 dark:text-brand-pink mb-6 pb-2 border-b border-brand-brown/10 flex items-center gap-2">
+          <i data-lucide="user-pen" class="w-5 h-5 text-brand-brown dark:text-brand-pink"></i>
+          Public Persona details
+        </h3>
+        
+        <form action="/auth/profile/update" method="POST" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label for="username" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Username</label>
+              <input type="text" id="username" name="username" value="<%= profileUser.username %>" required class="block w-full px-4 py-3 border border-brand-brown/20 dark:border-brand-brown/30 rounded-xl bg-brand-cream/10 text-gray-800 dark:text-white focus:outline-none focus:border-brand-brown dark:focus:border-brand-pink text-sm transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Registered Email (Read-Only)</label>
+              <input type="email" value="<%= profileUser.email %>" readonly class="block w-full px-4 py-3 border border-brand-brown/10 dark:border-brand-brown/15 rounded-xl bg-gray-50 dark:bg-brand-brown/5 text-gray-400 dark:text-gray-500 text-sm cursor-not-allowed">
+            </div>
+          </div>
+
+          <div>
+            <label for="bio" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Biography / Literary Taste</label>
+            <textarea id="bio" name="bio" rows="4" class="block w-full px-4 py-3 border border-brand-brown/20 dark:border-brand-brown/30 rounded-xl bg-brand-cream/10 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:border-brand-brown dark:focus:border-brand-pink text-sm transition-all" placeholder="Tell us about your favorite genres, writers, or what reading means to you..."><%= profileUser.bio %></textarea>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-6 py-3 bg-brand-brown hover:bg-brand-accent text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm flex items-center gap-2">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Card B: Security / Password Update -->
+      <div class="bg-white dark:bg-[#1E150F] p-6 sm:p-8 rounded-2xl shadow-sm border border-brand-brown/10 dark:border-brand-brown/20">
+        <h3 class="font-serif text-xl font-bold text-gray-800 dark:text-brand-pink mb-6 pb-2 border-b border-brand-brown/10 flex items-center gap-2">
+          <i data-lucide="shield-lock" class="w-5 h-5 text-brand-brown dark:text-brand-pink"></i>
+          Security Settings
+        </h3>
+        
+        <form action="/auth/profile/password" method="POST" class="space-y-5">
+          <div>
+            <label for="currentPassword" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Current Password</label>
+            <input type="password" id="currentPassword" name="currentPassword" required class="block w-full px-4 py-3 border border-brand-brown/20 dark:border-brand-brown/30 rounded-xl bg-brand-cream/10 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:border-brand-brown dark:focus:border-brand-pink text-sm transition-all" placeholder="••••••••">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label for="newPassword" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">New Password</label>
+              <input type="password" id="newPassword" name="newPassword" required class="block w-full px-4 py-3 border border-brand-brown/20 dark:border-brand-brown/30 rounded-xl bg-brand-cream/10 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:border-brand-brown dark:focus:border-brand-pink text-sm transition-all" placeholder="••••••••">
+            </div>
+            <div>
+              <label for="confirmNewPassword" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Confirm New Password</label>
+              <input type="password" id="confirmNewPassword" name="confirmNewPassword" required class="block w-full px-4 py-3 border border-brand-brown/20 dark:border-brand-brown/30 rounded-xl bg-brand-cream/10 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:border-brand-brown dark:focus:border-brand-pink text-sm transition-all" placeholder="••••••••">
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-6 py-3 bg-brand-brown hover:bg-brand-accent text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-sm flex items-center gap-2">
+              <i data-lucide="key-round" class="w-4 h-4"></i>
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>

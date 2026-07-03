@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" class="<%= darkMode ? 'dark' : '' %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | Online Novel Library' : 'Premium Online Novel Library' %></title>
+  
+  <!-- Typography & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS v4 via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              brown: '#6F4E37',
+              pink: '#F7D6E0',
+              cream: '#FFF8E7',
+              accent: '#8B5A2B',
+              dark: '#2E1E12'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Dark Mode Setup (Anti-Flicker) -->
+  <script>
+    // Inline script to prevent theme flickering (Elegant Dark)
+    const getTheme = () => {
+      const stored = document.cookie.split('; ').find(row => row.startsWith('darkMode='));
+      if (stored) {
+        return stored.split('=')[1] === 'true' ? 'dark' : 'light';
+      }
+      return 'dark';
+    };
+    if (getTheme() === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- Page Loader Animation Styling -->
+  <style>
+    /* Premium smooth transitions */
+    * {
+      transition-property: background-color, border-color, text-decoration-color, fill, stroke;
+      transition-duration: 200ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    :root {
+      --brown: #6F4E37;
+      --pink: #F7D6E0;
+      --cream: #FFF8E7;
+      --white: #FFFFFF;
+      --text: #2d1e16;
+    }
+
+    /* Elegant Theme Utility Classes */
+    .btn-brown {
+      background-color: var(--brown);
+      color: var(--white);
+      transition: all 0.3s ease;
+    }
+    .btn-brown:hover {
+      background-color: #8B5A2B;
+    }
+    .btn-pink {
+      background-color: var(--pink);
+      color: var(--brown);
+      transition: all 0.3s ease;
+    }
+    .btn-pink:hover {
+      background-color: #ffffff;
+      color: var(--brown);
+    }
+    .book-card {
+      background-color: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(111, 78, 55, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(111, 78, 55, 0.05);
+    }
+    .dark .book-card {
+      background-color: #1E150F;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(247, 214, 224, 0.15);
+    }
+    .author-pill {
+      background-color: rgba(247, 214, 224, 0.15);
+      border: 1px solid rgba(247, 214, 224, 0.3);
+      border-radius: 9999px;
+      transition: all 0.3s ease;
+    }
+    .dark .author-pill {
+      background-color: rgba(247, 214, 224, 0.05);
+      border: 1px solid rgba(247, 214, 224, 0.15);
+    }
+    .category-badge {
+      background-color: var(--white);
+      border: 1px solid var(--brown);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--brown);
+    }
+    .dark .category-badge {
+      background-color: #1E150F;
+      border: 1px solid var(--pink);
+      color: var(--pink);
+    }
+    .hero-overlay {
+      background: linear-gradient(rgba(111, 78, 55, 0.85), rgba(45, 30, 22, 0.95));
+      border-radius: 24px;
+    }
+    
+    /* Scrollbar hide helper */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .library-loader {
+      position: fixed;
+      inset: 0;
+      background-color: #FFF8E7; /* Cream */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .dark .library-loader {
+      background-color: #120C08; /* Dark brown */
+    }
+    .library-loader.hidden-loader {
+      opacity: 0;
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body class="bg-brand-cream/40 dark:bg-[#120C08] text-gray-800 dark:text-amber-50/90 font-sans min-h-screen flex flex-col selection:bg-brand-pink/60 selection:text-brand-dark">
+  
+  <!-- Loading Animation -->
+  <div id="app-loader" class="library-loader">
+    <div class="flex flex-col items-center">
+      <div class="w-16 h-16 border-4 border-brand-brown border-t-brand-pink rounded-full animate-spin"></div>
+      <h2 class="text-brand-brown dark:text-brand-pink font-serif text-xl mt-6 tracking-wide animate-pulse">Opening the library Gates...</h2>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('app-loader');
+      if (loader) {
+        loader.classList.add('hidden-loader');
+      }
+    });
+  </script>

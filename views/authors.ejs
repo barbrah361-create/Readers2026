@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/flash') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
+  
+  <!-- Page Header -->
+  <div class="mb-12 text-center">
+    <span class="text-brand-brown dark:text-brand-pink text-xs font-bold uppercase tracking-wider">Literary Guild Masters</span>
+    <h1 class="font-serif text-3xl sm:text-5xl font-bold mt-2 text-gray-800 dark:text-white">Meet Famous Authors</h1>
+    <p class="text-gray-500 dark:text-gray-400 max-w-xl mx-auto mt-4 text-sm sm:text-base leading-relaxed">
+      Learn about classical and modern creators who constructed the prose matching our collections. Read their detailed biographies and explore their works.
+    </p>
+  </div>
+
+  <!-- Authors grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <% authors.forEach(function(author) { %>
+      <div class="group book-card overflow-hidden hover:-translate-y-1">
+        
+        <div class="relative h-64 bg-brand-cream/45 overflow-hidden flex items-center justify-center">
+          <img src="<%= author.photo %>" alt="<%= author.name %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70"></div>
+          
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <span class="text-[10px] font-bold text-brand-pink uppercase tracking-widest"><%= author.nationality %></span>
+            <h2 class="font-serif text-lg sm:text-xl font-bold truncate mt-0.5"><%= author.name %></h2>
+          </div>
+        </div>
+
+        <div class="p-5 flex flex-col h-44 justify-between">
+          <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-2 flex items-center gap-1.5">
+              <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+              <%= author.literaryAchievements %>
+            </p>
+            <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
+              <%= author.bio %>
+            </p>
+          </div>
+          <div class="flex items-center justify-between border-t border-brand-brown/10 dark:border-brand-brown/15 pt-3.5 text-xs">
+            <span class="text-gray-400"><%= author.novelCount || 0 %> Books Catalogued</span>
+            <a href="/authors/<%= author._id %>" class="text-brand-brown dark:text-brand-pink font-bold hover:underline">Full Biography &rarr;</a>
+          </div>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+
+</div>
+
+<%- include('partials/footer') %>

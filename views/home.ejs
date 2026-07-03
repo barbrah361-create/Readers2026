@@ -1,0 +1,214 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/flash') %>
+
+<!-- 1. Full-Screen Hero Section -->
+<section class="relative h-screen flex items-center justify-center bg-cover bg-center overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1600&auto=format&fit=crop&q=80');">
+  <!-- Dark Cozy Library Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-b from-[#1C120C]/85 via-[#251811]/90 to-[#120C08] backdrop-blur-[2px]"></div>
+  
+  <!-- Subtle particle floating effect in background -->
+  <div class="absolute inset-0 bg-radial-gradient from-transparent to-black/20 pointer-events-none"></div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-pink/25 text-brand-pink border border-brand-pink/20 uppercase tracking-widest mb-6 animate-pulse">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+      The Literary Gateway
+    </span>
+    
+    <h1 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight mb-6">
+      Discover Stories That <br>
+      <span class="text-brand-pink italic font-normal">Stay With You Forever</span>
+    </h1>
+    
+    <p class="text-lg sm:text-xl text-gray-300 font-light max-w-2xl leading-relaxed mb-10">
+      Open the gates to an archival sanctuary of elegant prose. Hand-curated historical pieces, African classics, poetry collections, and modern mysteries await your presence.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+      <a href="/novels" class="px-8 py-4 bg-brand-brown hover:bg-brand-accent text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2.5">
+        <i data-lucide="book-open" class="w-5 h-5"></i>
+        Read Now
+      </a>
+      <% if (!user) { %>
+        <a href="/auth/register" class="px-8 py-4 bg-transparent hover:bg-white/10 text-white text-base font-semibold rounded-xl border border-white/30 hover:border-white transition-all duration-300 flex items-center justify-center gap-2.5">
+          <i data-lucide="user-plus" class="w-5 h-5"></i>
+          Create Account
+        </a>
+      <% } else { %>
+        <a href="/dashboard" class="px-8 py-4 bg-transparent hover:bg-white/10 text-white text-base font-semibold rounded-xl border border-white/30 hover:border-white transition-all duration-300 flex items-center justify-center gap-2.5">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          My Dashboard
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Decorative Scroll Arrow -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+    <a href="#featured-section" class="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors duration-200">
+      <i data-lucide="chevron-down" class="w-5 h-5"></i>
+    </a>
+  </div>
+</section>
+
+<!-- 2. Featured Novels Section -->
+<section id="featured-section" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+    <div>
+      <span class="text-brand-brown dark:text-brand-pink text-sm font-bold uppercase tracking-wider">Curated Archival</span>
+      <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mt-2 text-brand-dark dark:text-brand-pink">Featured Masterpieces</h2>
+    </div>
+    <a href="/novels" class="mt-4 md:mt-0 flex items-center gap-2 text-brand-brown dark:text-brand-pink hover:text-brand-accent font-semibold group">
+      Explore All Novels
+      <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-200"></i>
+    </a>
+  </div>
+
+  <!-- Novels Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <% featuredNovels.forEach(function(novel) { %>
+      <div class="group book-card overflow-hidden hover:-translate-y-1.5 flex flex-col h-full">
+        <!-- Cover image wrapper -->
+        <div class="relative h-72 overflow-hidden bg-brand-cream/50">
+          <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<%= novel.coverImage %>" alt="<%= novel.title %>" loading="lazy">
+          <div class="absolute top-4 right-4 bg-brand-cream/90 dark:bg-brand-dark/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-brand-brown/15 flex items-center gap-1">
+            <i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
+            <span class="text-xs font-bold text-brand-brown dark:text-brand-pink"><%= novel.rating %></span>
+          </div>
+          <span class="absolute bottom-4 left-4 bg-brand-brown text-brand-cream text-xs px-2.5 py-1 rounded-md font-semibold tracking-wider">
+            <%= novel.genre %>
+          </span>
+        </div>
+
+        <!-- Details -->
+        <div class="p-6 flex flex-col flex-grow">
+          <span class="text-xs font-medium text-gray-500 dark:text-gray-400">By <%= novel.authorName %></span>
+          <h3 class="font-serif text-xl font-bold mt-1 mb-2 text-gray-800 dark:text-white group-hover:text-brand-brown dark:group-hover:text-brand-pink transition-colors">
+            <%= novel.title %>
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-6 leading-relaxed flex-grow">
+            <%= novel.description %>
+          </p>
+
+          <div class="flex items-center justify-between border-t border-brand-brown/10 dark:border-brand-brown/15 pt-4 mt-auto">
+            <span class="text-xs font-medium text-gray-400 flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-4 h-4 text-brand-brown dark:text-brand-pink"></i>
+              <%= novel.readerCount %> readers
+            </span>
+            <a href="/novels/<%= novel._id %>" class="px-4 py-2 bg-brand-cream hover:bg-brand-pink/30 text-brand-brown dark:text-brand-pink font-semibold rounded-lg text-sm transition-colors flex items-center gap-1.5">
+              Read Details
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<!-- 3. Featured Authors Section -->
+<section class="py-24 bg-brand-cream/20 dark:bg-[#18100B]/50 border-y border-brand-brown/10 dark:border-brand-brown/20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+      <div>
+        <span class="text-brand-brown dark:text-brand-pink text-sm font-bold uppercase tracking-wider">Literary Minds</span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mt-2 text-brand-dark dark:text-brand-pink">Meet Famous Authors</h2>
+      </div>
+      <a href="/authors" class="mt-4 md:mt-0 flex items-center gap-2 text-brand-brown dark:text-brand-pink hover:text-brand-accent font-semibold group">
+        All Author Profiles
+        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-200"></i>
+      </a>
+    </div>
+
+    <!-- Authors Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <% featuredAuthors.forEach(function(author) { %>
+        <div class="group book-card overflow-hidden hover:-translate-y-1.5 flex flex-col h-full">
+          <div class="relative h-60 overflow-hidden bg-brand-cream/30 flex justify-center items-center">
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<%= author.photo %>" alt="<%= author.name %>" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+            
+            <div class="absolute bottom-4 left-4 right-4 text-white">
+              <span class="text-[10px] font-semibold text-brand-pink tracking-widest uppercase"><%= author.nationality %></span>
+              <h3 class="font-serif text-lg sm:text-xl font-bold truncate mt-0.5"><%= author.name %></h3>
+            </div>
+          </div>
+          <div class="p-5">
+            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed mb-4">
+              <%= author.bio %>
+            </p>
+            <div class="flex items-center justify-between pt-2 border-t border-brand-brown/10 dark:border-brand-brown/15 text-xs text-gray-400">
+              <span><%= author.novelCount %> Books Published</span>
+              <a href="/authors/<%= author._id %>" class="text-brand-brown dark:text-brand-pink font-semibold hover:underline">Profile &rarr;</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Novel Categories Section -->
+<section class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="text-center mb-16">
+    <span class="text-brand-brown dark:text-brand-pink text-sm font-bold uppercase tracking-wider">Explore Genres</span>
+    <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mt-2 text-brand-dark dark:text-brand-pink">Genres We House</h2>
+    <p class="text-gray-500 dark:text-gray-400 max-w-xl mx-auto mt-4 text-sm sm:text-base leading-relaxed">
+      Whether you long for sweeping romantic gestures, high stakes espionage, or rich African oral histories, choose your shelf.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+    <% categories.forEach(function(category) { %>
+      <a href="/novels?genre=<%= encodeURIComponent(category) %>" class="group p-6 bg-white dark:bg-[#1E150F] rounded-xl border border-brand-brown/10 dark:border-brand-brown/20 hover:border-brand-brown dark:hover:border-brand-pink shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center justify-center text-center">
+        <div class="w-12 h-12 rounded-full bg-brand-cream dark:bg-brand-brown/20 text-brand-brown dark:text-brand-pink flex items-center justify-center group-hover:scale-110 transition-transform mb-4">
+          <% if (category === 'Romance') { %> <i data-lucide="heart" class="w-5 h-5"></i>
+          <% } else if (category === 'Mystery') { %> <i data-lucide="search" class="w-5 h-5"></i>
+          <% } else if (category === 'Fantasy') { %> <i data-lucide="wand" class="w-5 h-5"></i>
+          <% } else if (category === 'Historical Fiction') { %> <i data-lucide="hourglass" class="w-5 h-5"></i>
+          <% } else if (category === 'African Literature') { %> <i data-lucide="compass" class="w-5 h-5"></i>
+          <% } else if (category === 'Science Fiction') { %> <i data-lucide="rocket" class="w-5 h-5"></i>
+          <% } else if (category === 'Horror') { %> <i data-lucide="skull" class="w-5 h-5"></i>
+          <% } else if (category === 'Thriller') { %> <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          <% } else if (category === 'Adventure') { %> <i data-lucide="mountain" class="w-5 h-5"></i>
+          <% } else if (category === 'Classics') { %> <i data-lucide="feather" class="w-5 h-5"></i>
+          <% } else if (category === 'Poetry') { %> <i data-lucide="music" class="w-5 h-5"></i>
+          <% } else { %> <i data-lucide="drama" class="w-5 h-5"></i> <% } %>
+        </div>
+        <h3 class="font-serif text-base font-bold text-gray-800 dark:text-white group-hover:text-brand-brown dark:group-hover:text-brand-pink transition-colors"><%= category %></h3>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<!-- 5. QR Code Sharing Section & Newsletter -->
+<section class="py-20 bg-[#251811] text-amber-50 relative overflow-hidden">
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(247,214,224,0.1),transparent_50%)]"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <div class="lg:col-span-8 space-y-6">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-pink/20 text-brand-pink">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          Invite the community
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">Share Elegance Library on Mobile</h2>
+        <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+          Scan the generated QR Code with your mobile device to open this digital library instantly and share stories with friends on social media. Together, let's keep the literary flame burning.
+        </p>
+      </div>
+
+      <div class="lg:col-span-4 flex flex-col items-center lg:items-end justify-center">
+        <div class="p-4 bg-brand-cream rounded-2xl shadow-xl flex flex-col items-center gap-3 w-64 border-2 border-brand-pink/20">
+          <img src="<%= shareQRCode %>" alt="Homepage QR Code" class="w-full aspect-square rounded-lg object-contain">
+          <span class="text-xs font-semibold text-brand-brown uppercase tracking-wider">Scan to Share Home</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

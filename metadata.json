@@ -1,0 +1,6 @@
+{
+  "name": "Online Novel Library",
+  "description": "A premium server-side rendered (SSR) online novel reading and library management platform with author profiles, user progress tracking, and secure dashboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

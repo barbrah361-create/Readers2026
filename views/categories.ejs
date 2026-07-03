@@ -1,0 +1,69 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/flash') %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
+  
+  <div class="text-center mb-16">
+    <span class="text-brand-brown dark:text-brand-pink text-xs font-bold uppercase tracking-wider">The Archival Stacks</span>
+    <h1 class="font-serif text-3xl sm:text-5xl font-bold mt-2 text-gray-800 dark:text-white">Explore Categories</h1>
+    <p class="text-gray-500 dark:text-gray-400 max-w-xl mx-auto mt-4 text-sm sm:text-base leading-relaxed">
+      Navigate through dedicated shelves housing historical pieces, award-winning African literature, fantasy adventures, and modern poetry.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <% categories.forEach(function(category) { %>
+      <div class="group bg-white dark:bg-[#1E150F] p-8 rounded-2xl border border-brand-brown/10 dark:border-brand-brown/20 hover:border-brand-brown dark:hover:border-brand-pink shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+        
+        <div class="space-y-4">
+          <!-- Icon -->
+          <div class="w-12 h-12 rounded-full bg-brand-cream dark:bg-brand-brown/20 text-brand-brown dark:text-brand-pink flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+            <% if (category === 'Romance') { %> <i data-lucide="heart" class="w-6 h-6"></i>
+            <% } else if (category === 'Mystery') { %> <i data-lucide="search" class="w-6 h-6"></i>
+            <% } else if (category === 'Fantasy') { %> <i data-lucide="wand" class="w-6 h-6"></i>
+            <% } else if (category === 'Historical Fiction') { %> <i data-lucide="hourglass" class="w-6 h-6"></i>
+            <% } else if (category === 'African Literature') { %> <i data-lucide="compass" class="w-6 h-6"></i>
+            <% } else if (category === 'Science Fiction') { %> <i data-lucide="rocket" class="w-6 h-6"></i>
+            <% } else if (category === 'Horror') { %> <i data-lucide="skull" class="w-6 h-6"></i>
+            <% } else if (category === 'Thriller') { %> <i data-lucide="shield-alert" class="w-6 h-6"></i>
+            <% } else if (category === 'Adventure') { %> <i data-lucide="mountain" class="w-6 h-6"></i>
+            <% } else if (category === 'Classics') { %> <i data-lucide="feather" class="w-6 h-6"></i>
+            <% } else if (category === 'Poetry') { %> <i data-lucide="music" class="w-6 h-6"></i>
+            <% } else { %> <i data-lucide="drama" class="w-6 h-6"></i> <% } %>
+          </div>
+
+          <!-- Name & Details -->
+          <div>
+            <h3 class="font-serif text-xl font-bold text-gray-800 dark:text-white group-hover:text-brand-brown dark:group-hover:text-brand-pink transition-colors"><%= category %></h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+              <% if (category === 'Romance') { %> swept by intense emotions, lifelong pledges, and warm chronicles.
+              <% } else if (category === 'Mystery') { %> shadows of doubt, master detectives, and hidden crime structures.
+              <% } else if (category === 'Fantasy') { %> kingdoms of magic lore, sorcery relics, and ancient quests.
+              <% } else if (category === 'Historical Fiction') { %> retold epochs, legendary figures, and real events framed by classical prose.
+              <% } else if (category === 'African Literature') { %> oral histories, cultural values, and award-winning contemporary accounts.
+              <% } else if (category === 'Science Fiction') { %> futuristic empires, deep space, and innovative technologies.
+              <% } else if (category === 'Horror') { %> spooky encounters, dark environments, and ancient curses.
+              <% } else if (category === 'Thriller') { %> suspenseful cliffhangers, ticking timers, and high-stakes conspiracies.
+              <% } else if (category === 'Adventure') { %> voyages through untamed wilderness, mountains, and hidden treasures.
+              <% } else if (category === 'Classics') { %> ageless masterpieces written across centuries of literary excellence.
+              <% } else if (category === 'Poetry') { %> structured stanzas, rhythmic expressions of the soul, and lyric collections.
+              <% } else { %> theatrical plays, tragedies, comedies, and dramatic dialogues. <% } %>
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-brand-brown/5 mt-6">
+          <a href="/novels?genre=<%= encodeURIComponent(category) %>" class="w-full py-2 bg-brand-cream hover:bg-brand-pink/30 text-brand-brown dark:text-brand-pink font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-1">
+            Browse Category Shelf
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+
+</div>
+
+<%- include('partials/footer') %>
