@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "83v6pkw84q7s3w0ti0nq1",
+    "id": "83v6pkw84q7s3w0ti0nq1",
+    "createdAt": "2026-07-03T06:49:29.793Z",
+    "username": "Barbrah",
+    "email": "barbrah361@gmail.com",
+    "passwordHash": "$2b$10$L85EZcbHdvhSARdLejW0w.LVzEXK.MKX1hEIEWvSC2efsTXi18yBy",
+    "role": "user",
+    "avatar": "/uploads/default-avatar.png",
+    "bio": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": []
+  }
+]

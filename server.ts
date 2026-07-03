@@ -18,6 +18,7 @@ import novelRoutes from './src/routes/novelRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import authorRoutes from './src/routes/authorRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import articleRoutes from './src/routes/articleRoutes.js';
 
 async function bootstrap() {
   const app = express();
@@ -88,6 +89,7 @@ async function bootstrap() {
   // 2. Main Route Groups
   app.use('/auth', authRoutes);
   app.use('/novels', novelRoutes);
+  app.use('/articles', articleRoutes);
   app.use('/admin', adminRoutes);
   app.use('/authors', authorRoutes);
   app.use('/', dashboardRoutes); // handles /dashboard, /history, /favorites directly

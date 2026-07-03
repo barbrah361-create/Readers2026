@@ -4,6 +4,7 @@ import { AuthorModel } from '../models/Author.js';
 import { CommentModel } from '../models/Comment.js';
 import { UserModel } from '../models/User.js';
 import { generateQRCode } from '../utils/qrcode.js';
+import { featuredArticles } from '../config/articles.js';
 
 export const NovelController = {
   // 1. Landing Page
@@ -25,6 +26,7 @@ export const NovelController = {
         title: 'Home',
         featuredNovels: novels,
         featuredAuthors: authors,
+        featuredArticles,
         categories,
         shareQRCode
       });

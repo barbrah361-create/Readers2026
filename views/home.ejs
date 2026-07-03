@@ -108,7 +108,50 @@
   </div>
 </section>
 
-<!-- 3. Featured Authors Section -->
+<!-- 3. Editorial Highlights Section -->
+<section class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+    <div>
+      <span class="text-brand-brown dark:text-brand-pink text-sm font-bold uppercase tracking-wider">Editorial Highlights</span>
+      <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mt-2 text-brand-dark dark:text-brand-pink">Featured Articles & Insights</h2>
+    </div>
+    <a href="/articles" class="mt-4 md:mt-0 flex items-center gap-2 text-brand-brown dark:text-brand-pink hover:text-brand-accent font-semibold group">
+      Read All Articles
+      <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-200"></i>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+    <% featuredArticles.forEach(function(article) { %>
+      <article class="group book-card overflow-hidden hover:-translate-y-1.5 transition-transform duration-300 h-full flex flex-col">
+        <div class="relative h-72 overflow-hidden bg-brand-cream/50">
+          <img src="<%= article.image %>" alt="<%= article.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
+            <span class="text-[10px] uppercase tracking-[0.25em] bg-brand-pink/90 text-brand-dark font-semibold px-2.5 py-1 rounded-full"><%= article.category %></span>
+            <span class="text-[10px] text-white bg-black/30 px-2.5 py-1 rounded-full"><%= article.readTime %></span>
+          </div>
+        </div>
+
+        <div class="p-6 flex flex-col flex-grow">
+          <h3 class="font-serif text-xl font-bold text-gray-900 dark:text-white mb-3"><%= article.title %></h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-6 flex-grow"><%= article.excerpt %></p>
+          <div class="flex items-center justify-between gap-3">
+            <div class="text-[11px] text-gray-500 dark:text-gray-400">
+              <span><strong>By</strong> <%= article.author %></span>
+            </div>
+            <a href="/articles/<%= article.id %>" class="inline-flex items-center gap-2 px-3 py-2 bg-brand-brown hover:bg-brand-accent text-white rounded-full text-xs font-semibold transition-all duration-200">
+              Read Article
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<!-- 4. Featured Authors Section -->
 <section class="py-24 bg-brand-cream/20 dark:bg-[#18100B]/50 border-y border-brand-brown/10 dark:border-brand-brown/20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
