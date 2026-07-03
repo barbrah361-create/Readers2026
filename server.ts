@@ -9,8 +9,9 @@ import { createServer as createViteServer } from 'vite';
 dotenv.config();
 
 // Imports
-import { setupLocals } from './src/middleware/authMiddleware.js';
+import { setupLocals, requireAuth } from './src/middleware/authMiddleware.js';
 import { NovelController } from './src/controllers/NovelController.js';
+import { AuthController } from './src/controllers/AuthController.js';
 
 // Route Imports
 import authRoutes from './src/routes/authRoutes.js';
@@ -80,6 +81,9 @@ async function bootstrap() {
   app.get('/contact', (req, res) => {
     res.render('contact', { title: 'Contact Our Librarians' });
   });
+
+  app.get('/profile', requireAuth, AuthController.getProfile);
+
 
   app.post('/contact', (req, res) => {
     req.flash('success', 'Your catalog query has been dispatched to our desk. A librarian will follow up shortly.');

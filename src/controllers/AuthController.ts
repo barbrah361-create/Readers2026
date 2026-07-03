@@ -126,7 +126,7 @@ export const AuthController = {
     const user = res.locals.user;
     if (!user) return res.redirect('/auth/login');
 
-    const { username, bio } = req.body;
+    const { username, bio, location, website, twitter, instagram, linkedin } = req.body;
 
     if (!username) {
       req.flash('error', 'Username is required.');
@@ -141,7 +141,7 @@ export const AuthController = {
     }
 
     try {
-      UserModel.findByIdAndUpdate(user._id, { username, bio });
+      UserModel.findByIdAndUpdate(user._id, { username, bio, location, website, twitter, instagram, linkedin });
       req.flash('success', 'Profile details updated successfully.');
       res.redirect('/profile');
     } catch (error) {

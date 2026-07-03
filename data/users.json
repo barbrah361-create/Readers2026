@@ -12,5 +12,40 @@
     "favorites": [],
     "bookmarks": [],
     "readingHistory": []
+  },
+  {
+    "_id": "929v0bqkos6he1jgpe9i",
+    "id": "929v0bqkos6he1jgpe9i",
+    "createdAt": "2026-07-03T08:54:26.370Z",
+    "username": "barbrah",
+    "email": "barbrah123@gmail.com",
+    "passwordHash": "$2b$10$3px1f9U3vRYF4ZGJh5ySPOUlpMbJBtIG6z6AwnjQh/A89IYHiBWsm",
+    "role": "user",
+    "avatar": "/uploads/avatar-1783070081125-481246742.jpg",
+    "bio": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": [],
+    "updatedAt": "2026-07-03T09:15:10.508Z"
+  },
+  {
+    "_id": "0ok4fask9qa09erbpypsmkw",
+    "id": "0ok4fask9qa09erbpypsmkw",
+    "createdAt": "2026-07-03T09:26:46.732Z",
+    "username": "Shiza",
+    "email": "giftshiza5@gmail.com",
+    "passwordHash": "$2b$10$fIWFbyPtYFjX2M1TimAUvu00LysyNvnT2U1l8hFd/MCLpHEZEz3ay",
+    "role": "user",
+    "avatar": "/uploads/avatar-1783070835189-453072126.jpg",
+    "bio": "",
+    "location": "",
+    "website": "",
+    "twitter": "",
+    "instagram": "",
+    "linkedin": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": [],
+    "updatedAt": "2026-07-03T09:27:15.205Z"
   }
 ]

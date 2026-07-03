@@ -22,6 +22,11 @@ export interface User {
   role: 'user' | 'admin';
   avatar?: string;
   bio?: string;
+  location?: string;
+  website?: string;
+  twitter?: string;
+  instagram?: string;
+  linkedin?: string;
   favorites: string[]; // novelIds
   bookmarks: Bookmark[];
   readingHistory: ReadingHistoryItem[];
@@ -46,6 +51,11 @@ export const UserModel = {
       role: data.role || 'user',
       avatar: data.avatar || '/uploads/default-avatar.png',
       bio: data.bio || '',
+      location: data.location || '',
+      website: data.website || '',
+      twitter: data.twitter || '',
+      instagram: data.instagram || '',
+      linkedin: data.linkedin || '',
       favorites: [],
       bookmarks: [],
       readingHistory: []
