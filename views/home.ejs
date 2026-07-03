@@ -203,24 +203,52 @@
     </p>
   </div>
 
+  <% const categoryImages = {
+    'Romance': '/uploads/romance novel.jpeg',
+    'Mystery': '/uploads/mystery.jpg',
+    'Fantasy': '/uploads/fantesy novel.png',
+    'Historical Fiction': '/uploads/historical fiction.webp',
+    'African Literature': '/uploads/African fictions.jpg',
+    'Science Fiction': '/uploads/science fiction.jpg',
+    'Horror': '/uploads/horror novel.webp',
+    'Thriller': '/uploads/thriller.webp',
+    'Adventure': '/uploads/adventure novel.webp',
+    'Classics': '/uploads/classics novels.jpg',
+    'Poetry': '/uploads/poetry.webp',
+    'Drama': '/uploads/Drama novel.webp'
+  } %>
+
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
     <% categories.forEach(function(category) { %>
-      <a href="/novels?genre=<%= encodeURIComponent(category) %>" class="group p-6 bg-white dark:bg-[#1E150F] rounded-xl border border-brand-brown/10 dark:border-brand-brown/20 hover:border-brand-brown dark:hover:border-brand-pink shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center justify-center text-center">
-        <div class="w-12 h-12 rounded-full bg-brand-cream dark:bg-brand-brown/20 text-brand-brown dark:text-brand-pink flex items-center justify-center group-hover:scale-110 transition-transform mb-4">
-          <% if (category === 'Romance') { %> <i data-lucide="heart" class="w-5 h-5"></i>
-          <% } else if (category === 'Mystery') { %> <i data-lucide="search" class="w-5 h-5"></i>
-          <% } else if (category === 'Fantasy') { %> <i data-lucide="wand" class="w-5 h-5"></i>
-          <% } else if (category === 'Historical Fiction') { %> <i data-lucide="hourglass" class="w-5 h-5"></i>
-          <% } else if (category === 'African Literature') { %> <i data-lucide="compass" class="w-5 h-5"></i>
-          <% } else if (category === 'Science Fiction') { %> <i data-lucide="rocket" class="w-5 h-5"></i>
-          <% } else if (category === 'Horror') { %> <i data-lucide="skull" class="w-5 h-5"></i>
-          <% } else if (category === 'Thriller') { %> <i data-lucide="shield-alert" class="w-5 h-5"></i>
-          <% } else if (category === 'Adventure') { %> <i data-lucide="mountain" class="w-5 h-5"></i>
-          <% } else if (category === 'Classics') { %> <i data-lucide="feather" class="w-5 h-5"></i>
-          <% } else if (category === 'Poetry') { %> <i data-lucide="music" class="w-5 h-5"></i>
-          <% } else { %> <i data-lucide="drama" class="w-5 h-5"></i> <% } %>
+      <a href="/novels?genre=<%= encodeURIComponent(category) %>" class="group overflow-hidden rounded-3xl border border-brand-brown/10 bg-brand-cream shadow-sm hover:shadow-md transition-all duration-200 flex flex-col text-left">
+        <div class="relative h-48 bg-brand-brown/5 overflow-hidden">
+          <img src="<%= categoryImages[category] || '/uploads/OIP.webp' %>" alt="<%= category %>" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent"></div>
+          <div class="absolute left-4 bottom-4 inline-flex items-center gap-2 rounded-full bg-brand-cream/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-brown shadow-sm">
+            <%= category %>
+          </div>
         </div>
-        <h3 class="font-serif text-base font-bold text-gray-800 dark:text-white group-hover:text-brand-brown dark:group-hover:text-brand-pink transition-colors"><%= category %></h3>
+        <div class="p-5">
+          <p class="text-sm text-brand-brown/80 leading-relaxed mb-4">
+            <% if (category === 'Romance') { %> Swept by intense emotions, lifelong pledges, and warm chronicles.
+            <% } else if (category === 'Mystery') { %> Shadows of doubt, master detectives, and hidden crime structures.
+            <% } else if (category === 'Fantasy') { %> Kingdoms of magic lore, sorcery relics, and ancient quests.
+            <% } else if (category === 'Historical Fiction') { %> Retold epochs, legendary figures, and real events framed by classical prose.
+            <% } else if (category === 'African Literature') { %> Oral histories, cultural values, and award-winning contemporary accounts.
+            <% } else if (category === 'Science Fiction') { %> Futuristic empires, deep space, and innovative technologies.
+            <% } else if (category === 'Horror') { %> Spooky encounters, dark environments, and ancient curses.
+            <% } else if (category === 'Thriller') { %> Suspenseful cliffhangers, ticking timers, and high-stakes conspiracies.
+            <% } else if (category === 'Adventure') { %> Voyages through untamed wilderness, mountains, and hidden treasures.
+            <% } else if (category === 'Classics') { %> Ageless masterpieces written across centuries of literary excellence.
+            <% } else if (category === 'Poetry') { %> Structured stanzas, rhythmic expressions of the soul, and lyric collections.
+            <% } else { %> Theatrical plays, tragedies, comedies, and dramatic dialogues.
+            <% } %>
+          </p>
+          <span class="inline-flex items-center gap-2 text-xs font-bold text-brand-brown uppercase tracking-[0.2em]">
+            Browse Shelf
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </span>
+        </div>
       </a>
     <% }) %>
   </div>

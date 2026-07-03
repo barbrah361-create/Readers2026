@@ -67,5 +67,25 @@
     "bookmarks": [],
     "readingHistory": [],
     "updatedAt": "2026-07-03T09:52:32.906Z"
+  },
+  {
+    "_id": "142rsiz4yjpha03ku581bce",
+    "id": "142rsiz4yjpha03ku581bce",
+    "createdAt": "2026-07-03T13:55:24.312Z",
+    "username": "Corazone",
+    "email": "corazone777@gmail.com",
+    "passwordHash": "$2b$10$Lt2pYqZ4gn6OWPzeJneALOaIDx2Z0emeOnR1NNLCa3lvMfcxntqN6",
+    "role": "user",
+    "avatar": "/uploads/avatar-1783086947704-608089549.jpg",
+    "bio": "",
+    "location": "Kapsoya",
+    "website": "",
+    "twitter": "",
+    "instagram": "",
+    "linkedin": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": [],
+    "updatedAt": "2026-07-03T13:56:36.158Z"
   }
 ]

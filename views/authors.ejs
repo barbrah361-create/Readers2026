@@ -13,6 +13,43 @@
     </p>
   </div>
 
+  <% const quoteCards = [
+    {
+      name: 'Maya Angelou',
+      image: '/uploads/maya-angelou-4.jpg',
+      quote: '“There is no greater agony than bearing an untold story inside you.”'
+    },
+    {
+      name: 'Chinua Achebe',
+      image: '/uploads/chinu achebe.jpg',
+      quote: '“The world is like a Mask dancing. If you want to see it well, you do not stand in one place.”'
+    },
+    {
+      name: 'J.K. Rowling',
+      image: '/uploads/j.k rawling.webp',
+      quote: '“We do not need magic to transform our world. We carry all the power we need inside ourselves already.”'
+    },
+    {
+      name: 'William Shakespeare',
+      image: '/uploads/shakespear.png',
+      quote: '“All the world’s a stage, and all the men and women merely players.”'
+    }
+  ]; %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <% quoteCards.forEach(function(card) { %>
+      <div class="group overflow-hidden rounded-3xl border border-brand-brown/10 bg-brand-cream shadow-sm hover:shadow-md transition-all duration-200">
+        <div class="relative h-56 overflow-hidden">
+          <img src="<%= card.image %>" alt="<%= card.name %>" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-6 text-brand-cream">
+            <span class="text-[10px] uppercase tracking-[0.25em] font-semibold text-brand-pink">Quote by <%= card.name %></span>
+            <p class="mt-3 text-sm leading-relaxed font-medium"><%= card.quote %></p>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
   <!-- Authors grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
     <% authors.forEach(function(author) { %>
