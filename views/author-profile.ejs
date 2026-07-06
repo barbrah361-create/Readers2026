@@ -27,6 +27,12 @@
           <p class="text-gray-600 dark:text-gray-300"><%= author.literaryAchievements %></p>
           <p class="font-bold text-gray-700 dark:text-white pt-1">📖 Historical Masterpieces:</p>
           <p class="text-gray-600 dark:text-gray-300"><%= author.famousNovels %></p>
+          <% if (author.externalLink) { %>
+            <a href="<%= author.externalLink %>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-brand-pink hover:text-brand-brown transition-colors">
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+              Explore this author online
+            </a>
+          <% } %>
         </div>
       </div>
 

@@ -276,7 +276,56 @@ export function initDB() {
         nationality: 'Brazilian',
         literaryAchievements: 'The Alchemist is an international bestseller and holds the Guinness World Record for the most translated book by a living author.',
         famousNovels: 'The Alchemist, Veronika Decides to Die, Eleven Minutes',
-        novelCount: 3
+        novelCount: 3,
+        externalLink: 'https://en.wikipedia.org/wiki/Paulo_Coelho'
+      },
+      {
+        _id: 'auth_mandela',
+        id: 'auth_mandela',
+        name: 'Nelson Mandela',
+        photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&auto=format&fit=crop&q=80',
+        bio: 'Nelson Mandela was a South African anti-apartheid revolutionary, political leader, and philanthropist who served as President of South Africa from 1994 to 1999. He is celebrated for his lifelong struggle for human rights and racial equality.',
+        nationality: 'South African',
+        literaryAchievements: 'Recipient of the Nobel Peace Prize in 1993 and author of one of the most influential autobiographies of the 20th century.',
+        famousNovels: 'Long Walk to Freedom',
+        novelCount: 1,
+        externalLink: 'https://en.wikipedia.org/wiki/Nelson_Mandela'
+      },
+      {
+        _id: 'auth_angelou',
+        id: 'auth_angelou',
+        name: 'Maya Angelou',
+        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
+        bio: 'Maya Angelou was an American poet, memoirist, and civil rights activist. Her work includes a series of seven autobiographies, essays, and poetry collections, and she is celebrated for her powerful voice on identity, struggle, and liberation.',
+        nationality: 'American',
+        literaryAchievements: 'Pulitzer Prize finalist, Presidential Medal of Freedom recipient, and a leading voice in African American literature.',
+        famousNovels: 'I Know Why the Caged Bird Sings, Gather Together in My Name, The Heart of a Woman',
+        novelCount: 3,
+        externalLink: 'https://en.wikipedia.org/wiki/Maya_Angelou'
+      },
+      {
+        _id: 'auth_rowling',
+        id: 'auth_rowling',
+        name: 'J.K. Rowling',
+        photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
+        bio: 'J.K. Rowling is a British author best known for the Harry Potter series, which became one of the best-selling book series in history and sparked a global reading movement.',
+        nationality: 'British',
+        literaryAchievements: 'Creator of a modern fantasy phenomenon and a champion of young readers worldwide.',
+        famousNovels: 'Harry Potter and the Sorcerer\'s Stone, Harry Potter and the Chamber of Secrets, Harry Potter and the Prisoner of Azkaban',
+        novelCount: 3,
+        externalLink: 'https://www.jkrowling.com'
+      },
+      {
+        _id: 'auth_ngugi',
+        id: 'auth_ngugi',
+        name: 'Ngũgĩ wa Thiong\'o',
+        photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
+        bio: 'Ngũgĩ wa Thiong\'o is a Kenyan writer and academic whose fiction and plays explore the cultural and political life of post-colonial Africa. He writes in both Gikuyu and English and is an important voice in African literature.',
+        nationality: 'Kenyan',
+        literaryAchievements: 'Winner of the Nonino International Prize for Literature and the Jerusalem Prize for the Freedom of the Individual in Society.',
+        famousNovels: 'The River Between, Petals of Blood, Wizard of the Crow',
+        novelCount: 3,
+        externalLink: 'https://en.wikipedia.org/wiki/Ng%C5%ABg%C4%AB_wa_Thiong%27o'
       }
     ];
     for (const auth of seedAuthors) {
@@ -386,6 +435,86 @@ export function initDB() {
           "Master was a little crazy; he had spent too many years in English schools, writing papers that nobody would ever read. Ugwu kept his head low and swept. He liked the smell of the house, ofbooks and floor wax, and the heavy drapes that kept out the afternoon sun.",
           "Odenigbo came home early, bringing three other lecturers. Their voices filled the living room with the heat of arguments. They drank beer and talked about the future of Nigeria, about pan-Africanism, about the white men who still pulled the strings.",
           "Ugwu brought them pepper soup. He was glad Odenigbo always thanked him. He was a good master, even if he talked to himself while reading. Ugwu would stay here. Umuahia was far away, and there was no meat there."
+        ]
+      },
+      {
+        _id: 'novel_long_walk',
+        id: 'novel_long_walk',
+        title: 'Long Walk to Freedom',
+        authorId: 'auth_mandela',
+        authorName: 'Nelson Mandela',
+        genre: 'Memoir',
+        publicationYear: 1994,
+        description: 'The story of Nelson Mandela’s extraordinary journey from anti-apartheid activist to South Africa’s first democratically elected president.',
+        synopsis: 'Long Walk to Freedom is the autobiography of Nelson Mandela, chronicling his childhood, education, 27 years in prison, and role in the struggle against apartheid. It is a foundational work for understanding modern South African history.',
+        coverImage: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
+        rating: 4.8,
+        ratingCount: 220,
+        readerCount: 1780,
+        contentPages: [
+          "He was taken from his village and sent to a boarding school where he first tasted the idea of a wider world. His years of study were shaped by the realities of segregation and the growing need for justice.",
+          "Mandela describes the early meetings of the African National Congress and the determination that hardened in him even as prison walls closed in. He reflected on the meaning of freedom, dignity, and forgiveness.",
+          "After twenty-seven years behind bars, he emerged ready to negotiate peace and build a united nation. His memoir is a testament to endurance, reconciliation, and the possibility of change."
+        ]
+      },
+      {
+        _id: 'novel_caged_bird',
+        id: 'novel_caged_bird',
+        title: 'I Know Why the Caged Bird Sings',
+        authorId: 'auth_angelou',
+        authorName: 'Maya Angelou',
+        genre: 'Autobiography',
+        publicationYear: 1969,
+        description: 'A moving memoir of Maya Angelou’s early years, exploring strength, trust, and the hope of rediscovery.',
+        synopsis: 'I Know Why the Caged Bird Sings recounts Maya Angelou’s childhood growing up in the segregated American South. The book charts her journey from trauma and silence to self-discovery and creative expression.',
+        coverImage: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&auto=format&fit=crop&q=80',
+        rating: 4.9,
+        ratingCount: 260,
+        readerCount: 2050,
+        contentPages: [
+          "She remembers the slow hot summers in Stamps, the smell of the cotton fields, and the constant motion of relatives around the house. The world is closed, but her imagination opens doorways.",
+          "The young girl learns to use words as armor and as a bridge. She writes poems, listens to stories, and realizes that her voice can carry her through fear.",
+          "By the end of this chapter of her life, she stands taller than the silence that once held her back. The caged bird sings because it has found a song worth sharing."
+        ]
+      },
+      {
+        _id: 'novel_philosophers_stone',
+        id: 'novel_philosophers_stone',
+        title: 'Harry Potter and the Philosopher\'s Stone',
+        authorId: 'auth_rowling',
+        authorName: 'J.K. Rowling',
+        genre: 'Fantasy',
+        publicationYear: 1997,
+        description: 'A young wizard discovers his destiny at Hogwarts School of Witchcraft and Wizardry in the first book of the Harry Potter series.',
+        synopsis: 'The story follows Harry Potter as he learns he is a wizard and begins his magical education. He finds friendship, faces dark secrets, and uncovers a mysterious stone that changes his life forever.',
+        coverImage: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&auto=format&fit=crop&q=80',
+        rating: 4.7,
+        ratingCount: 340,
+        readerCount: 2920,
+        contentPages: [
+          "Harry grew up with the Dursleys, who made him feel like a burden. Then the letters began arriving, and his ordinary life started to shift toward the extraordinary.",
+          "He boarded the Hogwarts Express, met Ron and Hermione, and stepped onto a platform that felt like the beginning of a new world. The castle glowed with possibilities.",
+          "The school year brought magic, mystery, and a hidden danger. Harry discovered that courage, friendship, and truth were more powerful than any spell."
+        ]
+      },
+      {
+        _id: 'novel_petals_of_blood',
+        id: 'novel_petals_of_blood',
+        title: 'Petals of Blood',
+        authorId: 'auth_ngugi',
+        authorName: 'Ngũgĩ wa Thiong\'o',
+        genre: 'Political Fiction',
+        publicationYear: 1967,
+        description: 'A piercing novel about the betrayal of a post-colonial Kenyan village in the name of progress and power.',
+        synopsis: 'Petals of Blood follows four characters whose lives intersect after a mysterious fire destroys the village hotel. The novel is a critique of corruption, neo-colonialism, and the loss of cultural values in the wake of independence.',
+        coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&auto=format&fit=crop&q=80',
+        rating: 4.8,
+        ratingCount: 145,
+        readerCount: 1190,
+        contentPages: [
+          "The hotel burned in the small town on a night when the harvest moon rose over the fields. The villagers woke to smoke, rumors, and the sense that nothing would remain the same.",
+          "The four visitors carried their own disappointments and hopes. Their conversations turned to old promises, stolen land, and the cost of pretending that independence was enough.",
+          "In the end, the story showed how easily ideals can be swallowed by greed, and how the simplest flowers can fall when petals of blood stain the ground."
         ]
       }
     ];

@@ -15,14 +15,14 @@
 
   <% const quoteCards = [
     {
-      name: 'Maya Angelou',
-      image: '/uploads/maya-angelou-4.jpg',
-      quote: '“There is no greater agony than bearing an untold story inside you.”'
-    },
-    {
       name: 'Chinua Achebe',
       image: '/uploads/chinu achebe.jpg',
       quote: '“The world is like a Mask dancing. If you want to see it well, you do not stand in one place.”'
+    },
+    {
+      name: 'Maya Angelou',
+      image: '/uploads/maya-angelou-4.jpg',
+      quote: '“There is no greater agony than bearing an untold story inside you.”'
     },
     {
       name: 'J.K. Rowling',
@@ -30,9 +30,9 @@
       quote: '“We do not need magic to transform our world. We carry all the power we need inside ourselves already.”'
     },
     {
-      name: 'William Shakespeare',
-      image: '/uploads/shakespear.png',
-      quote: '“All the world’s a stage, and all the men and women merely players.”'
+      name: 'Ngũgĩ wa Thiong\'o',
+      image: '/uploads/Ngugi wa thiongo.jpeg',
+      quote: '“The writer is a politician, although he is not a member of any political party.”'
     }
   ]; %>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -75,9 +75,14 @@
               <%= author.bio %>
             </p>
           </div>
-          <div class="flex items-center justify-between border-t border-brand-brown/10 dark:border-brand-brown/15 pt-3.5 text-xs">
+          <div class="flex items-center justify-between border-t border-brand-brown/10 dark:border-brand-brown/15 pt-3.5 text-xs gap-2">
             <span class="text-gray-400"><%= author.novelCount || 0 %> Books Catalogued</span>
-            <a href="/authors/<%= author._id %>" class="text-brand-brown dark:text-brand-pink font-bold hover:underline">Full Biography &rarr;</a>
+            <div class="flex items-center gap-2">
+              <% if (author.externalLink) { %>
+                <a href="<%= author.externalLink %>" target="_blank" rel="noopener noreferrer" class="text-brand-pink font-bold hover:underline">Explore Online</a>
+              <% } %>
+              <a href="/authors/<%= author._id %>" class="text-brand-brown dark:text-brand-pink font-bold hover:underline">Full Biography &rarr;</a>
+            </div>
           </div>
         </div>
 

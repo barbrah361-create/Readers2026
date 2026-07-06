@@ -87,5 +87,25 @@
     "bookmarks": [],
     "readingHistory": [],
     "updatedAt": "2026-07-03T13:56:36.158Z"
+  },
+  {
+    "_id": "e3oxbnep0p54fbzfyju9ob",
+    "id": "e3oxbnep0p54fbzfyju9ob",
+    "createdAt": "2026-07-04T20:02:25.878Z",
+    "username": "Maya Angelou",
+    "email": "maya222@gmail.com",
+    "passwordHash": "$2b$10$Ia0MYvsuv9xJBTbywKi59.u9Vaje9MwaT5U3cc1.hx5I/waxtF/Ym",
+    "role": "user",
+    "avatar": "/uploads/avatar-1783195382740-339577935.jpeg",
+    "bio": "",
+    "location": "",
+    "website": "",
+    "twitter": "",
+    "instagram": "",
+    "linkedin": "",
+    "favorites": [],
+    "bookmarks": [],
+    "readingHistory": [],
+    "updatedAt": "2026-07-04T20:03:02.788Z"
   }
 ]

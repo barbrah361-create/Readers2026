@@ -10,6 +10,7 @@ export interface Author {
   literaryAchievements: string;
   famousNovels: string;
   novelCount: number;
+  externalLink?: string;
   createdAt: string;
 }
 
