@@ -2,17 +2,25 @@ import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/uploadMiddleware.js';
+import { authLimiter } from '../middleware/securityMiddleware.js';
 
 const router = Router();
 
-// Guest routes
 router.get('/register', AuthController.getRegister);
-router.post('/register', AuthController.postRegister);
+router.post('/register', authLimiter, AuthController.postRegister);
 
 router.get('/login', AuthController.getLogin);
-router.post('/login', AuthController.postLogin);
+router.post('/login', authLimiter, AuthController.postLogin);
 
-// Auth required routes
+router.get('/verify-pending', requireAuth, AuthController.getVerifyPending);
+router.get('/verify-email', AuthController.getVerifyEmail);
+router.post('/resend-verification', requireAuth, AuthController.postResendVerification);
+
+router.get('/forgot-password', AuthController.getForgotPassword);
+router.post('/forgot-password', authLimiter, AuthController.postForgotPassword);
+router.get('/reset-password', AuthController.getResetPassword);
+router.post('/reset-password', authLimiter, AuthController.postResetPassword);
+
 router.get('/logout', requireAuth, AuthController.logout);
 router.get('/profile', requireAuth, AuthController.getProfile);
 router.post('/profile/update', requireAuth, AuthController.updateProfile);

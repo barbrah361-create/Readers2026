@@ -38,4 +38,13 @@ router.post('/users/suspend/:id', AdminController.postSuspendUser);
 router.post('/comments/dismiss/:id', AdminController.postDismissComment);
 router.post('/comments/delete/:id', AdminController.postDeleteComment);
 
+// Approval Queue
+router.get('/approvals', AdminController.getApprovals);
+router.post('/novels/approve/:id', AdminController.postApproveNovel);
+router.post('/novels/reject/:id', AdminController.postRejectNovel);
+router.post('/authors/approve/:id', AdminController.postApproveAuthor);
+router.post('/authors/reject/:id', AdminController.postRejectAuthor);
+router.post('/poems/approve/:id', AdminController.postApprovePoem);
+router.post('/poems/reject/:id', AdminController.postRejectPoem);
+
 export default router;

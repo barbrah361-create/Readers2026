@@ -4,23 +4,23 @@ import { AuthorModel } from '../models/Author.js';
 import { CommentModel } from '../models/Comment.js';
 import { UserModel } from '../models/User.js';
 import { generateQRCode } from '../utils/qrcode.js';
+import { CATEGORIES } from '../types/common.js';
+import { sanitizeText } from '../utils/sanitize.js';
 import { featuredArticles } from '../config/articles.js';
+import { getLocalAuthorPhoto } from '../utils/authorPhoto.js';
+
 
 export const NovelController = {
   // 1. Landing Page
   getHome: async (req: Request, res: Response) => {
     try {
-      const novels = NovelModel.find().limit(3).exec();
-      const authors = AuthorModel.find().limit(4).exec();
+      const novels = NovelModel.findPublic().sort({ readerCount: -1 }).limit(3).exec();
+      const authors = AuthorModel.findPublic().sort({ novelCount: -1 }).limit(4).exec();
       
       const hostUrl = req.protocol + '://' + req.get('host');
       const shareQRCode = await generateQRCode(hostUrl);
 
-      const categories = [
-        'Romance', 'Mystery', 'Fantasy', 'Historical Fiction', 
-        'African Literature', 'Science Fiction', 'Horror', 
-        'Thriller', 'Adventure', 'Classics', 'Poetry', 'Drama'
-      ];
+      const categories = [...CATEGORIES];
 
       res.render('home', {
         title: 'Home',
@@ -48,7 +48,7 @@ export const NovelController = {
       const authorId = (req.query.authorId as string) || '';
       const sort = (req.query.sort as string) || 'latest';
 
-      const query: any = {};
+      const query: any = { approvalStatus: 'approved' };
       if (search) {
         query.title = { $regex: search, $options: 'i' };
       }
@@ -76,12 +76,8 @@ export const NovelController = {
       const novels = queryChain.skip(skip).limit(limit).exec();
       const totalPages = Math.ceil(totalNovels / limit);
 
-      const authors = AuthorModel.find().exec();
-      const categories = [
-        'Romance', 'Mystery', 'Fantasy', 'Historical Fiction', 
-        'African Literature', 'Science Fiction', 'Horror', 
-        'Thriller', 'Adventure', 'Classics', 'Poetry', 'Drama'
-      ];
+      const authors = AuthorModel.findPublic().exec();
+      const categories = [...CATEGORIES];
 
       res.render('novels', {
         title: 'Discover Novels',
@@ -107,15 +103,18 @@ export const NovelController = {
     const { id } = req.params;
     try {
       const novel = NovelModel.findById(id);
-      if (!novel) {
+      if (!novel || (novel.approvalStatus !== 'approved' && !UserModel.isAdmin(res.locals.user))) {
         return res.status(404).render('error', { statusCode: 404, message: 'Novel not found.' });
       }
 
-      // Fetch author
       const author = AuthorModel.findById(novel.authorId);
-
-      // Fetch Comments
       const comments = CommentModel.find({ novelId: id }).sort({ createdAt: -1 }).exec();
+      const relatedNovels = NovelModel.findPublic({ genre: novel.genre })
+        .sort({ readerCount: -1 }).limit(6).exec()
+        .filter((n: any) => n._id !== id);
+      const authorNovels = NovelModel.findPublic({ authorId: novel.authorId })
+        .sort({ createdAt: -1 }).limit(6).exec()
+        .filter((n: any) => n._id !== id);
 
       // Generate Reading QR Code
       const hostUrl = req.protocol + '://' + req.get('host');
@@ -130,7 +129,9 @@ export const NovelController = {
         novel,
         author,
         comments,
-        qrCode
+        qrCode,
+        relatedNovels,
+        authorNovels
       });
     } catch (error) {
       console.error('Novel details error:', error);
@@ -293,7 +294,7 @@ export const NovelController = {
         userId: user._id,
         username: user.username,
         userAvatar: user.avatar || '/uploads/default-avatar.png',
-        content,
+        content: sanitizeText(content, 2000),
         rating: starRating
       });
 
@@ -339,7 +340,7 @@ export const NovelController = {
         replies.push({
           username: user.username,
           userAvatar: user.avatar || '/uploads/default-avatar.png',
-          content: replyContent,
+          content: sanitizeText(replyContent, 1000),
           createdAt: new Date().toISOString()
         });
         CommentModel.findByIdAndUpdate(commentId, { replies });
@@ -372,7 +373,10 @@ export const NovelController = {
   // 10. Authors List
   getAuthors: (req: Request, res: Response) => {
     try {
-      const authors = AuthorModel.find().exec();
+      const authors = AuthorModel.findPublic().exec().map((a: any) => ({
+        ...a,
+        photo: getLocalAuthorPhoto(a)
+      }));
       res.render('authors', { title: 'Meet Our Authors', authors });
     } catch (error) {
       console.error('Load authors error:', error);
@@ -380,17 +384,21 @@ export const NovelController = {
     }
   },
 
+
   // 11. Author Profile Page
   getAuthorProfile: (req: Request, res: Response) => {
     const { id } = req.params;
     try {
       const author = AuthorModel.findById(id);
-      if (!author) {
+      if (author) {
+        (author as any).photo = getLocalAuthorPhoto(author);
+      }
+
+      if (!author || (author.approvalStatus !== 'approved' && !UserModel.isAdmin(res.locals.user))) {
         return res.status(404).render('error', { statusCode: 404, message: 'Author not found.' });
       }
 
-      // Get novels written by this author
-      const novels = NovelModel.find({ authorId: id }).exec();
+      const novels = NovelModel.findPublic({ authorId: id }).sort({ readerCount: -1 }).exec();
 
       res.render('author-profile', {
         title: author.name,
@@ -405,11 +413,26 @@ export const NovelController = {
 
   // 12. Categories Page
   getCategories: (req: Request, res: Response) => {
-    const categories = [
-      'Romance', 'Mystery', 'Fantasy', 'Historical Fiction', 
-      'African Literature', 'Science Fiction', 'Horror', 
-      'Thriller', 'Adventure', 'Classics', 'Poetry', 'Drama'
-    ];
-    res.render('categories', { title: 'Explore Genres', categories });
+    const category = (req.query.category as string) || '';
+    const categories = [...CATEGORIES];
+
+    let categoryNovels: any[] = [];
+    if (category) {
+      const exact = NovelModel.findPublic({ genre: category }).sort({ readerCount: -1 }).limit(12).exec();
+      const similar = NovelModel.findPublic().sort({ readerCount: -1 }).limit(50).exec()
+        .filter((n: any) => n.genre !== category && (
+          n.tags?.includes(category) ||
+          n.genre?.toLowerCase().includes(category.toLowerCase().split(' ')[0])
+        )).slice(0, 12);
+      const recent = NovelModel.findPublic().sort({ createdAt: -1 }).limit(12).exec();
+      const seen = new Set<string>();
+      categoryNovels = [...exact, ...similar, ...recent].filter(n => {
+        if (seen.has(n._id)) return false;
+        seen.add(n._id);
+        return true;
+      }).slice(0, 24);
+    }
+
+    res.render('categories', { title: category || 'Explore Genres', categories, category, categoryNovels });
   }
 };

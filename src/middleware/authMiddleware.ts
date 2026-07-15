@@ -1,45 +1,52 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../models/User.js';
+import type { UserRole } from '../types/common.js';
 
-// Extend Express Session type
 declare module 'express-session' {
   interface SessionData {
     userId?: string;
     flash?: { [key: string]: string[] };
+    csrfToken?: string;
   }
 }
 
-// Custom request properties can be declared or we can just access session
 export function setupLocals(req: Request, res: Response, next: NextFunction) {
-  // Flash messages helper
   req.flash = (type: string, message: string) => {
     if (!req.session) return;
-    if (!req.session.flash) {
-      req.session.flash = {};
-    }
-    if (!req.session.flash[type]) {
-      req.session.flash[type] = [];
-    }
+    if (!req.session.flash) req.session.flash = {};
+    if (!req.session.flash[type]) req.session.flash[type] = [];
     req.session.flash[type].push(message);
   };
 
-  // Consume flash messages into locals
   res.locals.flash = {};
-  if (req.session && req.session.flash) {
+  if (req.session?.flash) {
     res.locals.flash = { ...req.session.flash };
-    req.session.flash = {}; // Clear flash
+    req.session.flash = {};
   }
 
-  // Set current path
   res.locals.currentPath = req.path;
-
-  // Set default dark mode state (Elegant Dark is true by default if no cookie is set)
   res.locals.darkMode = req.cookies?.darkMode !== 'false';
+  res.locals.appName = 'Readers';
+  res.locals.appUrl = process.env.APP_URL || 'http://localhost:3000';
 
-  // Load user if logged in
-  if (req.session && req.session.userId) {
+  if (req.session?.userId) {
     const user = UserModel.findById(req.session.userId);
     if (user) {
+      if (user.status === 'suspended') {
+        req.session.destroy(() => {});
+        res.locals.user = null;
+        return next();
+      }
+      res.locals.user = user;
+      return next();
+    }
+  }
+
+  const rememberToken = req.cookies?.remember_me;
+  if (rememberToken && !req.session?.userId) {
+    const user = UserModel.findOne({ rememberMeToken: rememberToken });
+    if (user && user.status === 'active') {
+      req.session!.userId = user._id;
       res.locals.user = user;
       return next();
     }
@@ -49,31 +56,71 @@ export function setupLocals(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// Require user authentication
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.session || !req.session.userId) {
+  if (!req.session?.userId) {
     req.flash('error', 'You must be logged in to view this page.');
     return res.redirect('/auth/login');
   }
   next();
 }
 
-// Require admin authentication
+export function requireVerified(req: Request, res: Response, next: NextFunction) {
+  if (!req.session?.userId) {
+    req.flash('error', 'You must be logged in to access this feature.');
+    return res.redirect('/auth/login');
+  }
+  const user = UserModel.findById(req.session.userId);
+  if (!user?.emailVerified) {
+    req.flash('error', 'Please verify your email address to access this feature.');
+    return res.redirect('/auth/verify-pending');
+  }
+  if (user.status === 'suspended') {
+    req.flash('error', 'Your account has been suspended.');
+    return res.redirect('/403');
+  }
+  next();
+}
+
+export function requireRole(...roles: UserRole[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.session?.userId) {
+      req.flash('error', 'You must be logged in.');
+      return res.redirect('/auth/login');
+    }
+    const user = UserModel.findById(req.session.userId);
+    const userRole = (user?.role === 'user' ? 'reader' : user?.role) as UserRole;
+    if (!user || !roles.includes(userRole)) {
+      req.flash('error', 'You do not have permission to access this page.');
+      return res.redirect('/403');
+    }
+    next();
+  };
+}
+
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  if (!req.session || !req.session.userId) {
+  if (!req.session?.userId) {
     req.flash('error', 'You must be logged in to access the admin portal.');
     return res.redirect('/auth/login');
   }
-  
   const user = UserModel.findById(req.session.userId);
-  if (!user || user.role !== 'admin') {
+  if (!UserModel.isAdmin(user)) {
     req.flash('error', 'Access denied. Administrator privileges required.');
     return res.redirect('/403');
   }
   next();
 }
 
-// Add custom flash method to Request interface
+export function requireModerator(req: Request, res: Response, next: NextFunction) {
+  if (!req.session?.userId) {
+    return res.redirect('/auth/login');
+  }
+  const user = UserModel.findById(req.session.userId);
+  if (!UserModel.isModerator(user)) {
+    return res.redirect('/403');
+  }
+  next();
+}
+
 declare global {
   namespace Express {
     interface Request {

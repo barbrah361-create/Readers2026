@@ -1,16 +1,14 @@
 import { Request, Response } from 'express';
 import { UserModel } from '../models/User.js';
+import { EmailService } from '../services/emailService.js';
+import { sanitizePlainText } from '../utils/sanitize.js';
 
 export const AuthController = {
-  // Show Register Form
   getRegister: (req: Request, res: Response) => {
-    if (req.session.userId) {
-      return res.redirect('/dashboard');
-    }
+    if (req.session.userId) return res.redirect('/dashboard');
     res.render('register', { title: 'Create Account' });
   },
 
-  // Handle Registration
   postRegister: async (req: Request, res: Response) => {
     const { username, email, password, confirmPassword } = req.body;
 
@@ -24,49 +22,47 @@ export const AuthController = {
       return res.redirect('/auth/register');
     }
 
+    if (password.length < 8) {
+      req.flash('error', 'Password must be at least 8 characters.');
+      return res.redirect('/auth/register');
+    }
+
     try {
-      // Check if user already exists
-      const existingUser = UserModel.findOne({ email });
-      if (existingUser) {
+      if (UserModel.findOne({ email: email.toLowerCase() })) {
         req.flash('error', 'An account with this email already exists.');
         return res.redirect('/auth/register');
       }
-
-      const existingUsername = UserModel.findOne({ username });
-      if (existingUsername) {
+      if (UserModel.findOne({ username })) {
         req.flash('error', 'Username is already taken.');
         return res.redirect('/auth/register');
       }
 
-      // Create User
       const user = await UserModel.create({
-        username,
-        email,
+        username: sanitizePlainText(username, 50),
+        email: email.toLowerCase().trim(),
         password,
-        role: 'user' // Default role
+        role: 'reader'
       });
 
+      await EmailService.sendVerification(user.email, user.username, user.emailVerificationToken!);
+
       req.session.userId = user._id;
-      req.flash('success', 'Welcome! Your account has been created successfully.');
-      res.redirect('/dashboard');
+      req.flash('success', 'Account created! Please check your email to verify your account.');
+      res.redirect('/auth/verify-pending');
     } catch (error) {
       console.error('Registration error:', error);
-      req.flash('error', 'An error occurred during registration. Please try again.');
+      req.flash('error', 'An error occurred during registration.');
       res.redirect('/auth/register');
     }
   },
 
-  // Show Login Form
   getLogin: (req: Request, res: Response) => {
-    if (req.session.userId) {
-      return res.redirect('/dashboard');
-    }
+    if (req.session.userId) return res.redirect('/dashboard');
     res.render('login', { title: 'Sign In' });
   },
 
-  // Handle Login
   postLogin: async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     if (!email || !password) {
       req.flash('error', 'Please enter your email and password.');
@@ -74,9 +70,14 @@ export const AuthController = {
     }
 
     try {
-      const user = UserModel.findOne({ email });
+      const user = UserModel.findOne({ email: email.toLowerCase().trim() });
       if (!user) {
         req.flash('error', 'Invalid email or password.');
+        return res.redirect('/auth/login');
+      }
+
+      if (user.status === 'suspended') {
+        req.flash('error', 'Your account has been suspended. Contact support.');
         return res.redirect('/auth/login');
       }
 
@@ -87,125 +88,212 @@ export const AuthController = {
       }
 
       req.session.userId = user._id;
-      req.flash('success', `Welcome back, ${user.username}!`);
-      
-      if (user.role === 'admin') {
-        res.redirect('/admin');
-      } else {
-        res.redirect('/dashboard');
+
+      if (rememberMe === 'on') {
+        const token = UserModel.generateToken();
+        UserModel.findByIdAndUpdate(user._id, { rememberMeToken: token });
+        res.cookie('remember_me', token, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
       }
+
+      req.flash('success', `Welcome back, ${user.username}!`);
+
+      if (UserModel.isAdmin(user)) {
+        return res.redirect('/admin');
+      }
+      if (!user.emailVerified) {
+        return res.redirect('/auth/verify-pending');
+      }
+      res.redirect('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      req.flash('error', 'An error occurred during sign in. Please try again.');
+      req.flash('error', 'An error occurred during sign in.');
       res.redirect('/auth/login');
     }
   },
 
-  // Logout
   logout: (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Logout error:', err);
-      }
-      res.redirect('/');
-    });
+    if (res.locals.user) {
+      UserModel.findByIdAndUpdate(res.locals.user._id, { rememberMeToken: '' });
+    }
+    res.clearCookie('remember_me');
+    req.session.destroy(() => res.redirect('/'));
   },
 
-  // Show Profile page
-  getProfile: (req: Request, res: Response) => {
-    const user = res.locals.user;
-    if (!user) {
-      req.flash('error', 'You must be logged in to view your profile.');
+  getVerifyPending: (req: Request, res: Response) => {
+    if (!req.session.userId) return res.redirect('/auth/login');
+    const user = UserModel.findById(req.session.userId);
+    if (user?.emailVerified) return res.redirect('/dashboard');
+    res.render('verify-pending', { title: 'Verify Your Email', email: user?.email });
+  },
+
+  getVerifyEmail: (req: Request, res: Response) => {
+    const { token } = req.query;
+    if (!token) {
+      req.flash('error', 'Invalid verification link.');
       return res.redirect('/auth/login');
     }
+
+    const user = UserModel.findOne({ emailVerificationToken: token as string });
+    if (!user) {
+      req.flash('error', 'Invalid or expired verification link.');
+      return res.redirect('/auth/login');
+    }
+
+    if (user.emailVerificationExpires && new Date(user.emailVerificationExpires) < new Date()) {
+      req.flash('error', 'Verification link has expired. Please request a new one.');
+      return res.redirect('/auth/verify-pending');
+    }
+
+    UserModel.findByIdAndUpdate(user._id, {
+      emailVerified: true,
+      emailVerificationToken: '',
+      emailVerificationExpires: ''
+    });
+
+    req.session.userId = user._id;
+    req.flash('success', 'Email verified successfully! Welcome to Readers.');
+    res.redirect('/dashboard');
+  },
+
+  postResendVerification: async (req: Request, res: Response) => {
+    if (!req.session.userId) return res.redirect('/auth/login');
+    const user = UserModel.findById(req.session.userId);
+    if (!user || user.emailVerified) return res.redirect('/dashboard');
+
+    const token = UserModel.generateToken();
+    UserModel.findByIdAndUpdate(user._id, {
+      emailVerificationToken: token,
+      emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    });
+
+    await EmailService.sendVerification(user.email, user.username, token);
+    req.flash('success', 'Verification email sent! Check your inbox.');
+    res.redirect('/auth/verify-pending');
+  },
+
+  getForgotPassword: (req: Request, res: Response) => {
+    res.render('forgot-password', { title: 'Forgot Password' });
+  },
+
+  postForgotPassword: async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const user = UserModel.findOne({ email: email?.toLowerCase()?.trim() });
+
+    if (user) {
+      const token = UserModel.generateToken();
+      UserModel.findByIdAndUpdate(user._id, {
+        passwordResetToken: token,
+        passwordResetExpires: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      });
+      await EmailService.sendPasswordReset(user.email, user.username, token);
+    }
+
+    req.flash('success', 'If an account exists with that email, a reset link has been sent.');
+    res.redirect('/auth/login');
+  },
+
+  getResetPassword: (req: Request, res: Response) => {
+    const { token } = req.query;
+    if (!token) {
+      req.flash('error', 'Invalid reset link.');
+      return res.redirect('/auth/login');
+    }
+    res.render('reset-password', { title: 'Reset Password', token });
+  },
+
+  postResetPassword: async (req: Request, res: Response) => {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token || !password || password !== confirmPassword) {
+      req.flash('error', 'Passwords do not match or invalid request.');
+      return res.redirect(`/auth/reset-password?token=${token}`);
+    }
+
+    const user = UserModel.findOne({ passwordResetToken: token });
+    if (!user || (user.passwordResetExpires && new Date(user.passwordResetExpires) < new Date())) {
+      req.flash('error', 'Invalid or expired reset link.');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    const passwordHash = await UserModel.hashPassword(password);
+    UserModel.findByIdAndUpdate(user._id, {
+      passwordHash,
+      passwordResetToken: '',
+      passwordResetExpires: ''
+    });
+
+    req.flash('success', 'Password reset successfully. You can now sign in.');
+    res.redirect('/auth/login');
+  },
+
+  getProfile: (req: Request, res: Response) => {
+    const user = res.locals.user;
+    if (!user) return res.redirect('/auth/login');
     res.render('profile', { title: 'My Profile', profileUser: user });
   },
 
-  // Update Profile details
   updateProfile: (req: Request, res: Response) => {
     const user = res.locals.user;
     if (!user) return res.redirect('/auth/login');
 
-    const { username, bio, location, website, twitter, instagram, linkedin } = req.body;
+    const { username, bio, location, website, twitter, instagram, linkedin, nationality, occupation, writingStyle } = req.body;
 
     if (!username) {
       req.flash('error', 'Username is required.');
       return res.redirect('/profile');
     }
 
-    // Check if username taken by someone else
     const existing = UserModel.findOne({ username });
     if (existing && String(existing._id) !== String(user._id)) {
       req.flash('error', 'Username is already taken.');
       return res.redirect('/profile');
     }
 
-    try {
-      UserModel.findByIdAndUpdate(user._id, { username, bio, location, website, twitter, instagram, linkedin });
-      req.flash('success', 'Profile details updated successfully.');
-      res.redirect('/profile');
-    } catch (error) {
-      console.error('Update profile error:', error);
-      req.flash('error', 'Could not update profile details.');
-      res.redirect('/profile');
-    }
+    UserModel.findByIdAndUpdate(user._id, {
+      username: sanitizePlainText(username, 50),
+      bio: sanitizePlainText(bio || '', 1000),
+      location: sanitizePlainText(location || '', 100),
+      nationality: sanitizePlainText(nationality || '', 100),
+      occupation: sanitizePlainText(occupation || '', 100),
+      writingStyle: sanitizePlainText(writingStyle || '', 200),
+      website, twitter, instagram, linkedin
+    });
+
+    req.flash('success', 'Profile updated successfully.');
+    res.redirect('/profile');
   },
 
-  // Update Profile picture (Avatar)
   updateAvatar: (req: Request, res: Response) => {
     const user = res.locals.user;
     if (!user) return res.redirect('/auth/login');
-
     if (!req.file) {
       req.flash('error', 'Please upload a valid image file.');
       return res.redirect('/profile');
     }
-
-    try {
-      const avatarUrl = `/uploads/${req.file.filename}`;
-      UserModel.findByIdAndUpdate(user._id, { avatar: avatarUrl });
-      req.flash('success', 'Profile picture updated successfully.');
-      res.redirect('/profile');
-    } catch (error) {
-      console.error('Update avatar error:', error);
-      req.flash('error', 'Could not update profile picture.');
-      res.redirect('/profile');
-    }
+    UserModel.findByIdAndUpdate(user._id, { avatar: `/uploads/${req.file.filename}` });
+    req.flash('success', 'Profile picture updated.');
+    res.redirect('/profile');
   },
 
-  // Update Password
   updatePassword: async (req: Request, res: Response) => {
     const user = res.locals.user;
     if (!user) return res.redirect('/auth/login');
 
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
-
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-      req.flash('error', 'All password fields are required.');
+    if (!currentPassword || !newPassword || newPassword !== confirmNewPassword) {
+      req.flash('error', 'Please check your password fields.');
       return res.redirect('/profile');
     }
 
-    if (newPassword !== confirmNewPassword) {
-      req.flash('error', 'New passwords do not match.');
+    const isMatch = await UserModel.comparePassword(currentPassword, user.passwordHash);
+    if (!isMatch) {
+      req.flash('error', 'Current password is incorrect.');
       return res.redirect('/profile');
     }
 
-    try {
-      const isMatch = await UserModel.comparePassword(currentPassword, user.passwordHash);
-      if (!isMatch) {
-        req.flash('error', 'Current password is incorrect.');
-        return res.redirect('/profile');
-      }
-
-      const passwordHash = await UserModel.hashPassword(newPassword);
-      UserModel.findByIdAndUpdate(user._id, { passwordHash });
-      
-      req.flash('success', 'Password updated successfully.');
-      res.redirect('/profile');
-    } catch (error) {
-      console.error('Update password error:', error);
-      req.flash('error', 'Could not update password.');
-      res.redirect('/profile');
-    }
+    const passwordHash = await UserModel.hashPassword(newPassword);
+    UserModel.findByIdAndUpdate(user._id, { passwordHash });
+    req.flash('success', 'Password updated successfully.');
+    res.redirect('/profile');
   }
 };

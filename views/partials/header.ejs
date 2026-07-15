@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' | Online Novel Library' : 'Premium Online Novel Library' %></title>
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Readers - Africa\'s largest online reading, writing and publishing community. Discover novels, poetry, and world-class authors.' %>">
+  <meta name="theme-color" content="#6F4E37">
+  <link rel="canonical" href="<%= typeof canonical !== 'undefined' ? canonical : (appUrl + currentPath) %>">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Readers">
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title + ' | Readers' : 'Readers - Digital Library & Writing Community' %>">
+  <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Africa\'s largest online reading, writing and publishing community' %>">
+  <meta property="og:image" content="<%= appUrl %>/icon-512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title><%= typeof title !== 'undefined' ? title + ' | Readers' : 'Readers - Digital Library & Writing Community' %></title>
   
   <!-- Typography & Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,6 +166,26 @@
     .dark .library-loader {
       background-color: #120C08; /* Dark brown */
     }
+    .glass-card {
+      background: rgba(255, 248, 231, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(111, 78, 55, 0.1);
+      border-radius: 16px;
+    }
+    .dark .glass-card {
+      background: rgba(30, 21, 15, 0.7);
+      border: 1px solid rgba(247, 214, 224, 0.1);
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #f0e6d8 25%, #fff8e7 50%, #f0e6d8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
     .library-loader.hidden-loader {
       opacity: 0;
       visibility: hidden;
@@ -166,11 +198,14 @@
   <div id="app-loader" class="library-loader">
     <div class="flex flex-col items-center">
       <div class="w-16 h-16 border-4 border-brand-brown border-t-brand-pink rounded-full animate-spin"></div>
-      <h2 class="text-brand-brown dark:text-brand-pink font-serif text-xl mt-6 tracking-wide animate-pulse">Opening the library Gates...</h2>
+      <h2 class="text-brand-brown dark:text-brand-pink font-serif text-xl mt-6 tracking-wide animate-pulse">Opening the Library Gates...</h2>
     </div>
   </div>
 
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
     window.addEventListener('load', () => {
       const loader = document.getElementById('app-loader');
       if (loader) {

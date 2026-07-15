@@ -3,6 +3,9 @@ import { NovelModel } from '../models/Novel.js';
 import { AuthorModel } from '../models/Author.js';
 import { UserModel } from '../models/User.js';
 import { CommentModel } from '../models/Comment.js';
+import { PoemModel } from '../models/Poem.js';
+import { PaymentModel } from '../models/Payment.js';
+import { EmailService } from '../services/emailService.js';
 
 export const AdminController = {
   // 1. Admin Index / Dashboard with Analytics
@@ -19,6 +22,11 @@ export const AdminController = {
 
       // Reported Comments
       const reportedComments = CommentModel.find({ isReported: true }).exec();
+      const pendingNovels = NovelModel.find({ approvalStatus: 'pending' }).exec();
+      const pendingAuthors = AuthorModel.find({ approvalStatus: 'pending' }).exec();
+      const pendingPoems = PoemModel.find({ approvalStatus: 'pending' }).exec();
+      const payments = PaymentModel.find({ status: 'completed' }).exec();
+      const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
 
       // Datasets for Analytics Charts
       const allNovels = NovelModel.find().exec();
@@ -67,9 +75,14 @@ export const AdminController = {
           authorsCount,
           usersCount,
           activeReadersCount,
-          reportedCommentsCount: reportedComments.length
+          reportedCommentsCount: reportedComments.length,
+          pendingCount: pendingNovels.length + pendingAuthors.length + pendingPoems.length,
+          totalRevenue
         },
         reportedComments,
+        pendingNovels,
+        pendingAuthors,
+        pendingPoems,
         chartData: {
           mostReadNovels,
           authorPopularity,
@@ -401,7 +414,7 @@ export const AdminController = {
     try {
       const user = UserModel.findById(id);
       if (user) {
-        const newRole = user.role === 'admin' ? 'user' : 'admin';
+        const newRole = user.role === 'admin' ? 'reader' : 'admin';
         UserModel.findByIdAndUpdate(id, { role: newRole });
         req.flash('success', `User role updated to ${newRole}.`);
       } else {
@@ -425,8 +438,8 @@ export const AdminController = {
     }
 
     try {
-      UserModel.findByIdAndDelete(id);
-      req.flash('success', 'User account suspended and removed.');
+      UserModel.findByIdAndUpdate(id, { status: 'suspended' });
+      req.flash('success', 'User account suspended.');
       res.redirect('/admin/users');
     } catch (error) {
       console.error('Suspend user error:', error);
@@ -449,7 +462,84 @@ export const AdminController = {
     }
   },
 
-  // POST Delete Reported Comment
+  getApprovals: (req: Request, res: Response) => {
+    const pendingNovels = NovelModel.find({ approvalStatus: 'pending' }).sort({ createdAt: -1 }).exec();
+    const pendingAuthors = AuthorModel.find({ approvalStatus: 'pending' }).sort({ createdAt: -1 }).exec();
+    const pendingPoems = PoemModel.find({ approvalStatus: 'pending' }).sort({ createdAt: -1 }).exec();
+    res.render('admin-approvals', {
+      title: 'Approval Queue',
+      pendingNovels,
+      pendingAuthors,
+      pendingPoems
+    });
+  },
+
+  postApproveNovel: async (req: Request, res: Response) => {
+    const novel = NovelModel.findById(req.params.id);
+    if (!novel) return res.redirect('/admin/approvals');
+    NovelModel.findByIdAndUpdate(novel._id, { approvalStatus: 'approved' });
+    const submitter = novel.submittedBy ? UserModel.findById(novel.submittedBy) : null;
+    if (submitter) {
+      await EmailService.sendUploadApproved(submitter.email, submitter.username, 'novel', novel.title, `/novels/${novel._id}`);
+    }
+    req.flash('success', `"${novel.title}" approved and published.`);
+    res.redirect('/admin/approvals');
+  },
+
+  postRejectNovel: async (req: Request, res: Response) => {
+    const novel = NovelModel.findById(req.params.id);
+    if (!novel) return res.redirect('/admin/approvals');
+    const reason = req.body.reason || '';
+    NovelModel.findByIdAndUpdate(novel._id, { approvalStatus: 'rejected', rejectionReason: reason });
+    const submitter = novel.submittedBy ? UserModel.findById(novel.submittedBy) : null;
+    if (submitter) {
+      await EmailService.sendUploadRejected(submitter.email, submitter.username, 'novel', novel.title, reason);
+    }
+    req.flash('success', `"${novel.title}" rejected.`);
+    res.redirect('/admin/approvals');
+  },
+
+  postApproveAuthor: async (req: Request, res: Response) => {
+    const author = AuthorModel.findById(req.params.id);
+    if (!author) return res.redirect('/admin/approvals');
+    AuthorModel.findByIdAndUpdate(author._id, { approvalStatus: 'approved', verified: true });
+    req.flash('success', `"${author.name}" approved.`);
+    res.redirect('/admin/approvals');
+  },
+
+  postRejectAuthor: (req: Request, res: Response) => {
+    const author = AuthorModel.findById(req.params.id);
+    if (!author) return res.redirect('/admin/approvals');
+    AuthorModel.findByIdAndUpdate(author._id, { approvalStatus: 'rejected' });
+    req.flash('success', `"${author.name}" rejected.`);
+    res.redirect('/admin/approvals');
+  },
+
+  postApprovePoem: async (req: Request, res: Response) => {
+    const poem = PoemModel.findById(req.params.id);
+    if (!poem) return res.redirect('/admin/approvals');
+    PoemModel.findByIdAndUpdate(poem._id, { approvalStatus: 'approved' });
+    const submitter = UserModel.findById(poem.submittedBy);
+    if (submitter) {
+      await EmailService.sendUploadApproved(submitter.email, submitter.username, 'poem', poem.title, `/poems/${poem._id}`);
+    }
+    req.flash('success', `"${poem.title}" approved and published.`);
+    res.redirect('/admin/approvals');
+  },
+
+  postRejectPoem: async (req: Request, res: Response) => {
+    const poem = PoemModel.findById(req.params.id);
+    if (!poem) return res.redirect('/admin/approvals');
+    const reason = req.body.reason || '';
+    PoemModel.findByIdAndUpdate(poem._id, { approvalStatus: 'rejected', rejectionReason: reason });
+    const submitter = UserModel.findById(poem.submittedBy);
+    if (submitter) {
+      await EmailService.sendUploadRejected(submitter.email, submitter.username, 'poem', poem.title, reason);
+    }
+    req.flash('success', `"${poem.title}" rejected.`);
+    res.redirect('/admin/approvals');
+  },
+
   postDeleteComment: (req: Request, res: Response) => {
     const { id } = req.params;
     try {

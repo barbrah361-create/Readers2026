@@ -1,5 +1,7 @@
 import { UserDB } from '../config/db.js';
 import bcryptjs from 'bcryptjs';
+import crypto from 'crypto';
+import type { UserRole, UserStatus } from '../types/common.js';
 
 export interface Bookmark {
   novelId: string;
@@ -19,62 +21,116 @@ export interface User {
   username: string;
   email: string;
   passwordHash: string;
-  role: 'user' | 'admin';
+  role: UserRole | 'user' | 'admin';
+  status: UserStatus;
   avatar?: string;
+  coverPhoto?: string;
   bio?: string;
   location?: string;
+  nationality?: string;
+  occupation?: string;
+  writingStyle?: string;
+  genres?: string[];
   website?: string;
   twitter?: string;
   instagram?: string;
   linkedin?: string;
-  favorites: string[]; // novelIds
+  facebook?: string;
+  verified: boolean;
+  emailVerified: boolean;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: string;
+  rememberMeToken?: string;
+  googleId?: string;
+  following: string[];
+  followers: string[];
+  favorites: string[];
   bookmarks: Bookmark[];
   readingHistory: ReadingHistoryItem[];
+  awards?: string[];
+  achievements?: string[];
   createdAt: string;
+}
+
+function normalizeRole(role: string): UserRole {
+  if (role === 'admin') return 'admin';
+  if (role === 'user') return 'reader';
+  return role as UserRole;
 }
 
 export const UserModel = {
   find: (query?: any) => UserDB.find(query),
   findOne: (query?: any) => UserDB.findOne(query),
   findById: (id: string) => UserDB.findById(id),
-  
-  create: async (data: Omit<User, '_id' | 'id' | 'createdAt' | 'favorites' | 'bookmarks' | 'readingHistory' | 'passwordHash'> & { password?: string; passwordHash?: string }) => {
+
+  create: async (data: {
+    username: string;
+    email: string;
+    password?: string;
+    passwordHash?: string;
+    role?: UserRole | 'user';
+    googleId?: string;
+    emailVerified?: boolean;
+  }) => {
     let passwordHash = data.passwordHash;
     if (data.password) {
       passwordHash = await bcryptjs.hash(data.password, 10);
     }
-    
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
     return UserDB.create({
       username: data.username,
       email: data.email,
       passwordHash,
-      role: data.role || 'user',
-      avatar: data.avatar || '/uploads/default-avatar.png',
-      bio: data.bio || '',
-      location: data.location || '',
-      website: data.website || '',
-      twitter: data.twitter || '',
-      instagram: data.instagram || '',
-      linkedin: data.linkedin || '',
+      role: normalizeRole(data.role || 'reader'),
+      status: 'active',
+      avatar: '/uploads/default-avatar.png',
+      coverPhoto: '',
+      bio: '',
+      location: '',
+      nationality: '',
+      occupation: '',
+      writingStyle: '',
+      genres: [],
+      website: '',
+      twitter: '',
+      instagram: '',
+      linkedin: '',
+      facebook: '',
+      verified: false,
+      emailVerified: data.emailVerified ?? false,
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      googleId: data.googleId || '',
+      following: [],
+      followers: [],
       favorites: [],
       bookmarks: [],
-      readingHistory: []
+      readingHistory: [],
+      awards: [],
+      achievements: []
     });
   },
 
-  findByIdAndUpdate: (id: string, update: any) => {
-    return UserDB.findByIdAndUpdate(id, update);
-  },
+  findByIdAndUpdate: (id: string, update: any) => UserDB.findByIdAndUpdate(id, update),
+  findByIdAndDelete: (id: string) => UserDB.findByIdAndDelete(id),
 
-  findByIdAndDelete: (id: string) => {
-    return UserDB.findByIdAndDelete(id);
-  },
+  comparePassword: async (password: string, hash: string): Promise<boolean> =>
+    bcryptjs.compare(password, hash),
 
-  comparePassword: async (password: string, hash: string): Promise<boolean> => {
-    return bcryptjs.compare(password, hash);
-  },
+  hashPassword: async (password: string): Promise<string> =>
+    bcryptjs.hash(password, 10),
 
-  hashPassword: async (password: string): Promise<string> => {
-    return bcryptjs.hash(password, 10);
-  }
+  generateToken: () => crypto.randomBytes(32).toString('hex'),
+
+  isAdmin: (user: User | null): boolean =>
+    !!user && (user.role === 'admin' || (user.role as string) === 'admin'),
+
+  isModerator: (user: User | null): boolean =>
+    !!user && ['admin', 'moderator'].includes(user.role as string),
+
+  canAccessProtected: (user: User | null): boolean =>
+    !!user && user.status === 'active' && user.emailVerified
 };
